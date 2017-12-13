@@ -1,28 +1,4 @@
 ﻿// /**
-//  *　　　　　　　　┏┓　　　┏┓+ +
-//  *　　　　　　　┏┛┻━━━┛┻┓ + +
-//  *　　　　　　　┃　　　　　　　┃ 　
-//  *　　　　　　　┃　　　━　　　┃ ++ + + +
-//  *　　　　　　 ████━████ ┃+
-//  *　　　　　　　┃　　　　　　　┃ +
-//  *　　　　　　　┃　　　┻　　　┃
-//  *　　　　　　　┃　　　　　　　┃ + +
-//  *　　　　　　　┗━┓　　　┏━┛
-//  *　　　　　　　　　┃　　　┃　　　　　　　　　　　
-//  *　　　　　　　　　┃　　　┃ + + + +
-//  *　　　　　　　　　┃　　　┃　　　　Code is far away from bug with the animal protecting　　　　　　　
-//  *　　　　　　　　　┃　　　┃ + 　　　　神兽保佑,代码无bug　　
-//  *　　　　　　　　　┃　　　┃
-//  *　　　　　　　　　┃　　　┃　　+　　　　　　　　　
-//  *　　　　　　　　　┃　 　　┗━━━┓ + +
-//  *　　　　　　　　　┃ 　　　　　　　┣┓
-//  *　　　　　　　　　┃ 　　　　　　　┏┛
-//  *　　　　　　　　　┗┓┓┏━┳┓┏┛ + + + +
-//  *　　　　　　　　　　┃┫┫　┃┫┫
-//  *　　　　　　　　　　┗┻┛　┗┻┛+ + + +
-//  *
-//  *
-//  * ━━━━━━感觉萌萌哒━━━━━━
 //  * 
 //  * 说明：保存文件到相册的插件
 //  *     Android 平台 
@@ -52,6 +28,9 @@ public class BlankGalleryScreenshot : MonoBehaviour
 #if UNITY_IPHONE || UNITY_IOS
     [DllImport("__Internal")]
     private static extern int addImageToGallery(string path);
+
+    [DllImport("__Internal")]
+	private static extern void addVideoToGallery(string path);
 #endif
 
     private static BlankGalleryScreenshot _instance;
@@ -61,13 +40,13 @@ public class BlankGalleryScreenshot : MonoBehaviour
         {
             if (_instance == null)
             {
-                string GalleryScreenshotBridgeLink = "GalleryScreenshotBridgeLink";
-                GameObject go = GameObject.Find(GalleryScreenshotBridgeLink);
+                const string galleryScreenshotBridgeLink = "GalleryScreenshotBridgeLink";
+                GameObject go = GameObject.Find(galleryScreenshotBridgeLink);
                 if (go != null)
                 {
                     Destroy(go);
                 }
-                go = new GameObject(GalleryScreenshotBridgeLink);
+                go = new GameObject(galleryScreenshotBridgeLink);
                 _instance = go.AddComponent<BlankGalleryScreenshot>();
             }
             return _instance;
@@ -75,10 +54,28 @@ public class BlankGalleryScreenshot : MonoBehaviour
     }
 
     /// <summary>
+    /// 把Application.persistentDataPath 目录下的视频文件移动到相册目录 并且注册到相册
+    /// </summary>
+    /// <param name="filePath"></param>
+    public void AddVideoToGallery(string filePath)
+    {
+#if UNITY_ANDROID
+
+        AndroidJavaClass ajc = new AndroidJavaClass("com.alianhome.galleryscreenshot.MainActivity");
+
+        ajc.CallStatic("addVideoToGallery", filePath);
+#endif
+#if UNITY_IPHONE || UNITY_IOS
+        addVideoToGallery(filePath);
+#endif
+    }
+
+
+    /// <summary>
     /// 把Application.persistentDataPath 目录下的图像文件移动到相册目录 并且注册到相册
     /// </summary>
     /// <param name="filePath"></param>
-    public void SaveGalleryScreenshot(string filePath)
+    public void AddImageToGallery(string filePath)
     {
 #if UNITY_ANDROID
 
@@ -102,11 +99,11 @@ public class BlankGalleryScreenshot : MonoBehaviour
 
         if (state.Equals("Finish"))
         {
-            Debug.Log("保存完成");
+            Debug.Log("Save Finsh");
         }
         else if (state.Equals("Start"))
         {
-            Debug.Log("开始保存");
+            Debug.Log("Save Start");
         }
     }
 

@@ -7,6 +7,7 @@
 
 extern "C" {
 #endif
+    void addVideoToGallery(const char * path);
     void addImageToGallery(const char * path);
 #ifdef __cplusplus
 }
